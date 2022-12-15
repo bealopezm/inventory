@@ -24,5 +24,7 @@ namespace Test1.Model
         public double Weight { get; set; }
 
         public int Quantity { get; set; }
+
+        public int IsDeleted { get; set; }
     }
 }

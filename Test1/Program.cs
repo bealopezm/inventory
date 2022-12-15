@@ -44,6 +44,13 @@ internal class Program
                         DisplayMenuContents();
                         break;
                     case '4':
+                        Console.WriteLine("Enter a name.");
+                        var productName = Console.ReadLine();
+                        deleteData(sqlite_conn, productName);
+                        Console.WriteLine("");
+                        DisplayMenuContents();
+                        break;
+                    case '5':
                         CloseConnection(sqlite_conn);
                         exit = true;
                         break;
@@ -65,7 +72,8 @@ internal class Program
             Console.WriteLine("[1] Insert a product.");
             Console.WriteLine("[2] List all products.");
             Console.WriteLine("[3] Search a product.");
-            Console.WriteLine("[4] Exit App.");
+            Console.WriteLine("[4] Delete a product.");
+            Console.WriteLine("[5] Exit App.");
 
             Console.WriteLine("");
         }
@@ -102,7 +110,7 @@ internal class Program
             SQLiteCommand sqlite_cmd = conn.CreateCommand();
 
             //Returns or sets the command string for the specified data source.
-            sqlite_cmd.CommandText = "CREATE TABLE if not exists Item (Id INTEGER NOT NULL UNIQUE, Name TEXT NOT NULL, ExpirationDate TEXT NOT NULL, Type TEXT NOT NULL, NetPrice REAL NOT NULL, Weight REAL NOT NULL, Quantity INTEGER NOT NULL, PRIMARY KEY(Id AUTOINCREMENT))";
+            sqlite_cmd.CommandText = "CREATE TABLE if not exists Item (Id INTEGER NOT NULL UNIQUE, Name TEXT NOT NULL, ExpirationDate TEXT NOT NULL, Type TEXT NOT NULL, NetPrice REAL NOT NULL, Weight REAL NOT NULL, Quantity INTEGER NOT NULL, IsDeleted INTEGER NOT NULL, PRIMARY KEY(Id AUTOINCREMENT))";
             sqlite_cmd.ExecuteNonQuery();
 
         }
@@ -113,17 +121,76 @@ internal class Program
             Item obj = new Item();
             Console.WriteLine("Enter a name of the product.");
             obj.Name = Console.ReadLine();
-            Console.WriteLine("Enter a expiration date of the product.");
-            obj.ExpirationDate = DateTime.Parse(Console.ReadLine());
+
+            Console.WriteLine("Enter a valid expiration date (dd/MM/yyyy) of the product.");
+
+            var nonValidDate = true;
+            do
+            {
+                try
+                {
+                    obj.ExpirationDate = DateTime.Parse(Console.ReadLine());
+                    nonValidDate = false;
+                }
+                catch (Exception)
+                {
+
+                    Console.WriteLine("Enter a valid expiration date (dd/MM/yyyy) of the product.");
+                }
+            } while (nonValidDate);
+         
             Console.WriteLine("Enter the type of item.");
             obj.Type = Console.ReadLine();
-            Console.WriteLine("Enter the net price of the product.");
-            obj.NetPrice = double.Parse(Console.ReadLine());
-            Console.WriteLine("Enter the weight of the product (Kilograms or litres).");
-            obj.Weight = double.Parse(Console.ReadLine());
-            Console.WriteLine("Enter the quantity of the product.");
-            obj.Quantity = int.Parse(Console.ReadLine());
 
+            Console.WriteLine("Enter a valid net price (0,00) of the product.");
+            var nonValidPrice = true;
+            do
+            {
+                try
+                {
+                    obj.NetPrice = double.Parse(Console.ReadLine());
+                    nonValidPrice = false;
+                }
+                catch (Exception)
+                {
+
+                    Console.WriteLine("Enter a valid net price (0,00) of the product.");
+                }
+            } while (nonValidPrice);
+            
+
+            Console.WriteLine("Enter a valid weight (0,00) of the product (Kilograms or litres).");
+            var nonValidWeight = true;
+            do
+            {
+                try
+                {
+                    obj.Weight = double.Parse(Console.ReadLine());
+                    nonValidWeight = false;
+                }
+                catch (Exception)
+                {
+
+                    Console.WriteLine("Enter a valid weight (0,00) of the product (Kilograms or litres).");
+                }
+            } while (nonValidWeight);
+            
+
+            Console.WriteLine("Enter the quantity of the product.");
+            var nonValidQuantity = true;
+            do
+            {
+                try
+                {
+                    obj.Quantity = int.Parse(Console.ReadLine());
+                    nonValidQuantity = false;
+                }
+                catch (Exception)
+                {
+
+                    Console.WriteLine("Enter the quantity of the product.");
+                }
+            } while (nonValidQuantity);
             return obj;
         }
 
@@ -131,7 +198,7 @@ internal class Program
         {
             var obj = CreateObj();
             SQLiteCommand sqlite_cmd = conn.CreateCommand();
-            sqlite_cmd.CommandText = "INSERT INTO Item(Name, ExpirationDate, Type, NetPrice, Weight, Quantity) VALUES(@name, @expirationDate, @type, @netPrice, @weight, @quantity)";
+            sqlite_cmd.CommandText = "INSERT INTO Item(Name, ExpirationDate, Type, NetPrice, Weight, Quantity, IsDeleted) VALUES(@name, @expirationDate, @type, @netPrice, @weight, @quantity, false)";
             sqlite_cmd.Parameters.Add(new SQLiteParameter("@name", obj.Name));
             sqlite_cmd.Parameters.Add(new SQLiteParameter("@expirationDate", obj.ExpirationDate));
             sqlite_cmd.Parameters.Add(new SQLiteParameter("@type", obj.Type));
@@ -156,18 +223,21 @@ internal class Program
             //Read the table.
             while (sqlite_datareader.Read())
             {
-                items.Add(new Item()
+                var isDeleted = int.Parse(sqlite_datareader["IsDeleted"].ToString());
+                if (isDeleted == 0)
                 {
-                    Id = int.Parse(sqlite_datareader["Id"].ToString()),
-                    Name = sqlite_datareader["Name"].ToString(),
-                    ExpirationDate = DateTime.Parse(sqlite_datareader["ExpirationDate"].ToString()),
-                    Type = sqlite_datareader["Type"].ToString(),
-                    NetPrice = double.Parse(sqlite_datareader["NetPrice"].ToString()),
-                    Weight = double.Parse(sqlite_datareader["Weight"].ToString()),
-                    Quantity = int.Parse(sqlite_datareader["Quantity"].ToString())
-
-                });
-
+                    items.Add(new Item()
+                    {
+                        Id = int.Parse(sqlite_datareader["Id"].ToString()),
+                        Name = sqlite_datareader["Name"].ToString(),
+                        ExpirationDate = DateTime.Parse(sqlite_datareader["ExpirationDate"].ToString()),
+                        Type = sqlite_datareader["Type"].ToString(),
+                        NetPrice = double.Parse(sqlite_datareader["NetPrice"].ToString()),
+                        Weight = double.Parse(sqlite_datareader["Weight"].ToString()),
+                        Quantity = int.Parse(sqlite_datareader["Quantity"].ToString()),
+                        IsDeleted = int.Parse(sqlite_datareader["IsDeleted"].ToString())
+                    });
+                };
             }
             sqlite_datareader.Close();
 
@@ -175,7 +245,7 @@ internal class Program
             if (items.Count > 0)
             {
                 Console.WriteLine("Inventory:");
-                items.ForEach(item => Console.WriteLine("{0}: Expiration Date: {1}, Type: {2}, Net Price: {3}, Weight: {4} y Quantity: {5}", item.Name, item.ExpirationDate, item.Type, item.NetPrice, item.Weight, item.Quantity));
+                items.ForEach(item => Console.WriteLine("{0}: Expiration Date: {1}, Type: {2}, Net Price: {3}, Weight: {4}, Quantity: {5} and isDeleted: {6}", item.Name, item.ExpirationDate, item.Type, item.NetPrice, item.Weight, item.Quantity, item.IsDeleted));
             }
             else
             {
@@ -194,17 +264,22 @@ internal class Program
 
             while (sqlite_datareader.Read())
             {
-                item = new Item()
+                var isDeleted = int.Parse(sqlite_datareader["IsDeleted"].ToString());
+                if (isDeleted == 0)
                 {
-                    Id = int.Parse(sqlite_datareader["Id"].ToString()),
-                    Name = sqlite_datareader["Name"].ToString(),
-                    ExpirationDate = DateTime.Parse(sqlite_datareader["ExpirationDate"].ToString()),
-                    Type = sqlite_datareader["Type"].ToString(),
-                    NetPrice = double.Parse(sqlite_datareader["NetPrice"].ToString()),
-                    Weight = double.Parse(sqlite_datareader["Weight"].ToString()),
-                    Quantity = int.Parse(sqlite_datareader["Quantity"].ToString())
-
-                };
+                    item = new Item()
+                    {
+                        Id = int.Parse(sqlite_datareader["Id"].ToString()),
+                        Name = sqlite_datareader["Name"].ToString(),
+                        ExpirationDate = DateTime.Parse(sqlite_datareader["ExpirationDate"].ToString()),
+                        Type = sqlite_datareader["Type"].ToString(),
+                        NetPrice = double.Parse(sqlite_datareader["NetPrice"].ToString()),
+                        Weight = double.Parse(sqlite_datareader["Weight"].ToString()),
+                        Quantity = int.Parse(sqlite_datareader["Quantity"].ToString()),
+                        IsDeleted = int.Parse(sqlite_datareader["IsDeleted"].ToString())
+                    };
+                }
+                    
             }
             sqlite_datareader.Close();
 
@@ -215,11 +290,17 @@ internal class Program
             }
             else
             {
-                Console.WriteLine("{0}: Expiration Date: {1}, Type: {2}, Net Price: {3}, Weight: {4} y Quantity: {5}", item.Name, item.ExpirationDate, item.Type, item.NetPrice, item.Weight, item.Quantity);
-                // If contains a item, delete the item.
-                sqlite_cmd.CommandText = "Delete FROM Item Where name ='" + name + "'";
-                sqlite_cmd.ExecuteNonQuery();
+                Console.WriteLine("{0}: Expiration Date: {1}, Type: {2}, Net Price: {3}, Weight: {4}, Quantity: {5} and isDeleted: {6}", item.Name, item.ExpirationDate, item.Type, item.NetPrice, item.Weight, item.Quantity, item.IsDeleted);
             }
+
+        }
+
+        void deleteData(SQLiteConnection conn, string productName)
+        {
+            searchData(conn, productName);
+            SQLiteCommand sqlite_cmd = conn.CreateCommand();
+            sqlite_cmd.CommandText = "UPDATE Item set IsDeleted = 1 Where name ='" + productName + "'" ;
+            sqlite_cmd.ExecuteNonQuery();
 
         }
     }
