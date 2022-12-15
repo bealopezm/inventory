@@ -39,7 +39,7 @@ internal class Program
                     case '3':
                         Console.WriteLine("Enter a name.");
                         var name = Console.ReadLine();
-                        searchItem(sqlite_conn, name );
+                        searchData(sqlite_conn, name );
                         Console.WriteLine("");
                         DisplayMenuContents();
                         break;
@@ -98,9 +98,9 @@ internal class Program
         {
             // Create table if not exists.
             //Represents a SQL statement to be executed against a SQLite database.
-            SQLiteCommand sqlite_cmd;
             //Create and returrns a SqlCommand.
-            sqlite_cmd = conn.CreateCommand();
+            SQLiteCommand sqlite_cmd = conn.CreateCommand();
+
             //Returns or sets the command string for the specified data source.
             sqlite_cmd.CommandText = "CREATE TABLE if not exists Item (Id INTEGER NOT NULL UNIQUE, Name TEXT NOT NULL, ExpirationDate TEXT NOT NULL, Type TEXT NOT NULL, NetPrice REAL NOT NULL, Weight REAL NOT NULL, Quantity INTEGER NOT NULL, PRIMARY KEY(Id AUTOINCREMENT))";
             sqlite_cmd.ExecuteNonQuery();
@@ -130,8 +130,7 @@ internal class Program
         void InsertData(SQLiteConnection conn)
         {
             var obj = CreateObj();
-            SQLiteCommand sqlite_cmd;
-            sqlite_cmd = conn.CreateCommand();
+            SQLiteCommand sqlite_cmd = conn.CreateCommand();
             sqlite_cmd.CommandText = "INSERT INTO Item(Name, ExpirationDate, Type, NetPrice, Weight, Quantity) VALUES(@name, @expirationDate, @type, @netPrice, @weight, @quantity)";
             sqlite_cmd.Parameters.Add(new SQLiteParameter("@name", obj.Name));
             sqlite_cmd.Parameters.Add(new SQLiteParameter("@expirationDate", obj.ExpirationDate));
@@ -148,12 +147,11 @@ internal class Program
         {
             List<Item> items = new List<Item>();
             //Methods for reading the result of a command executed.
-            SQLiteDataReader sqlite_datareader;
-            SQLiteCommand sqlite_cmd;
-            sqlite_cmd = conn.CreateCommand();
+           
+            SQLiteCommand sqlite_cmd = conn.CreateCommand();
             sqlite_cmd.CommandText = "SELECT * FROM Item";
             //Sends the CommandText to the Connection and builds a SqlDataReader 
-            sqlite_datareader = sqlite_cmd.ExecuteReader();
+            SQLiteDataReader sqlite_datareader = sqlite_cmd.ExecuteReader();
 
             //Read the table.
             while (sqlite_datareader.Read())
@@ -186,14 +184,13 @@ internal class Program
             
         }
 
-        void searchItem(SQLiteConnection conn, string name)
+        void searchData(SQLiteConnection conn, string name)
         {
             Item item = null;
-            SQLiteDataReader sqlite_datareader;
-            SQLiteCommand sqlite_cmd;
-            sqlite_cmd = conn.CreateCommand();
+           
+            SQLiteCommand sqlite_cmd = conn.CreateCommand();
             sqlite_cmd.CommandText = "SELECT * FROM Item Where name ='" + name + "'";
-            sqlite_datareader = sqlite_cmd.ExecuteReader();
+            SQLiteDataReader sqlite_datareader = sqlite_cmd.ExecuteReader();
 
             while (sqlite_datareader.Read())
             {
