@@ -1,0 +1,17 @@
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\Test1.exe.config
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\Test1.exe
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\Test1.pdb
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\EntityFramework.dll
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\System.Data.SQLite.dll
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\System.Data.SQLite.EF6.dll
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\System.Data.SQLite.Linq.dll
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\EntityFramework.xml
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\bin\Debug\System.Data.SQLite.xml
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\obj\Debug\Test1.csproj.AssemblyReference.cache
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\obj\Debug\Test1.csproj.SuggestedBindingRedirects.cache
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\obj\Debug\Test1.csproj.CoreCompileInputs.cache
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\obj\Debug\Test1.csproj.CopyComplete
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\obj\Debug\Test1.exe
+C:\Users\beatriz.lopez\Desktop\.NET\Test1\Test1\Test1\obj\Debug\Test1.pdb
